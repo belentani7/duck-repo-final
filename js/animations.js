@@ -1,6 +1,9 @@
 // animations.js — GSAP scroll animations for DUCK
-(function() {
-  if (typeof gsap === 'undefined') return;
+let animationsInitialized = false;
+
+export function initAnimations() {
+  if (animationsInitialized || typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+  animationsInitialized = true;
   gsap.registerPlugin(ScrollTrigger);
 
   // Reveal sections on scroll
@@ -73,4 +76,4 @@
       }
     });
   });
-})();
+}

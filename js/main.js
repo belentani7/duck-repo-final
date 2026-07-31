@@ -1,4 +1,10 @@
 // DUCK — Main JavaScript
+import { DUCK_DATA } from './data.js';
+import { initAnimations } from './animations.js';
+import { initHoverEffects } from './hover-effects.js';
+import { initMicroInteractions } from './micro-interactions.js';
+import { initParticlesCSS } from './particles.js';
+
 document.addEventListener('DOMContentLoaded', function() {
   console.log('DUCK Website Initialized');
   var initFunctions = [
@@ -12,16 +18,18 @@ document.addEventListener('DOMContentLoaded', function() {
     { name: 'hero', fn: initHero },
     { name: 'heroWaveform', fn: initHeroWaveform },
     { name: 'stats', fn: initStats },
-    { name: 'about', fn: initAbout },
     { name: 'services', fn: initServices },
+    { name: 'singles', fn: initSingles },
     { name: 'stations', fn: initStations },
     { name: 'gear', fn: initGear },
     { name: 'testimonials', fn: initTestimonials },
     { name: 'instruments', fn: initInstruments },
     { name: 'particles', fn: initParticlesCSS },
+    { name: 'hoverEffects', fn: initHoverEffects },
+    { name: 'microInteractions', fn: initMicroInteractions },
+    { name: 'animations', fn: initAnimations },
     { name: 'contactForm', fn: initContactForm },
-    { name: 'lenis', fn: initLenis },
-    { name: 'scrollAnimations', fn: initScrollAnimations }
+    { name: 'lenis', fn: initLenis }
   ];
   initFunctions.forEach(function(item) {
     try { item.fn(); } catch (e) { console.warn('[DUCK] ' + item.name + ' failed:', e.message); }
@@ -38,7 +46,6 @@ function initPreloader() {
   var drops = preloader.querySelectorAll('.slime-drop');
   drops.forEach(function(drop, i) { drop.style.animationDelay = (i * 0.1) + 's'; });
 }
-
 function initCursor() {
   var cursor = document.getElementById('cursor');
   if (!cursor || window.innerWidth < 768) return;
@@ -197,13 +204,6 @@ function animateCounter(element, target) {
       else element.textContent = Math.floor(current) + '+';
     }
   }, 30);
-}
-
-function initAbout() {
-  if (typeof gsap === 'undefined') return;
-  gsap.registerPlugin(ScrollTrigger);
-  gsap.from('.about-txt', { scrollTrigger: { trigger: '.about-g', start: 'top 80%' }, opacity: 0, x: -50, duration: 1 });
-  gsap.from('.about-img', { scrollTrigger: { trigger: '.about-g', start: 'top 80%' }, opacity: 0, x: 50, duration: 1 });
 }
 
 function initServices() {
@@ -496,22 +496,6 @@ function initRecorder() {
   });
 }
 
-function initParticlesCSS() {
-  var container = document.getElementById('particles');
-  if (!container) return;
-  for (var i = 0; i < 30; i++) {
-    var p = document.createElement('div');
-    p.style.cssText = 'position:fixed;width:' + (Math.random() * 4 + 2) + 'px;height:' + (Math.random() * 4 + 2) + 'px;background:rgba(154,203,107,' + (Math.random() * 0.3 + 0.05) + ');border-radius:50%;left:' + (Math.random() * 100) + '%;top:' + (Math.random() * 100) + '%;pointer-events:none;z-index:1;animation:particleFloat ' + (Math.random() * 20 + 15) + 's linear infinite;animation-delay:' + (Math.random() * -20) + 's;';
-    container.appendChild(p);
-  }
-  if (!document.getElementById('particle-keyframes')) {
-    var style = document.createElement('style');
-    style.id = 'particle-keyframes';
-    style.textContent = '@keyframes particleFloat{0%{transform:translateY(0) translateX(0);opacity:0;}10%{opacity:1;}90%{opacity:1;}100%{transform:translateY(-100vh) translateX(50px);opacity:0;}}';
-    document.head.appendChild(style);
-  }
-}
-
 function initContactForm() {
   var form = document.getElementById('contact-form');
   if (!form) return;
@@ -532,15 +516,4 @@ function initLenis() {
   });
   function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
   requestAnimationFrame(raf);
-}
-
-function initScrollAnimations() {
-  if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
-  gsap.registerPlugin(ScrollTrigger);
-  gsap.utils.toArray('.sec').forEach(function(section) {
-    gsap.from(section, { scrollTrigger: { trigger: section, start: 'top 80%' }, opacity: 0, y: 50, duration: 1 });
-  });
-  gsap.utils.toArray('.svc').forEach(function(card, i) {
-    gsap.from(card, { scrollTrigger: { trigger: card, start: 'top 85%' }, opacity: 0, y: 30, duration: 0.5, delay: i * 0.1 });
-  });
 }

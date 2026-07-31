@@ -26,7 +26,6 @@ Portfolio web premium do **Duck**, produtor musical de Aracaju, Sergipe. Site in
 ```
 DUCK-REPO-FINAL/
 ├── index.html          # Página principal
-├── data.js             # Todos os dados do projeto
 ├── css/                # 19 módulos CSS
 │   ├── tokens.css      # Design tokens (cores, tipografia)
 │   ├── tokens-premium.css
@@ -47,8 +46,9 @@ DUCK-REPO-FINAL/
 │   ├── animations-premium.css
 │   ├── cursor.css
 │   └── responsive.css
-├── js/                 # 5 módulos JS
-│   ├── main.js         # Lógica principal
+├── js/                 # 6 módulos ES
+│   ├── data.js         # Todos os dados do projeto
+│   ├── main.js         # Entrada e lógica principal
 │   ├── animations.js   # GSAP + ScrollTrigger
 │   ├── hover-effects.js
 │   ├── micro-interactions.js
@@ -110,7 +110,7 @@ npx netlify deploy --prod
 # Otimizar imagens
 node scripts/optimize-images.js
 
-# Minificar CSS/JS
+# Gerar pacote estático em dist/ (CSS, módulos ES e imagens)
 node scripts/build.js
 
 # Gerar sitemap

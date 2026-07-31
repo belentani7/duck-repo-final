@@ -1,88 +1,72 @@
 /**
  * DUCK PROD - Build Script
- * Minifica CSS e JS para produção
+ * Prepara um pacote estático para produção.
  */
 
 const fs = require('fs');
 const path = require('path');
 
-const BUILD_DIR = path.join(__dirname, '..', 'dist');
-
-// Criar diretório de build
-if (!fs.existsSync(BUILD_DIR)) {
-  fs.mkdirSync(BUILD_DIR, { recursive: true });
-}
-
-// Lista de arquivos CSS para concatenar
+const ROOT_DIR = path.join(__dirname, '..');
+const BUILD_DIR = path.join(ROOT_DIR, 'dist');
 const cssFiles = [
-  'css/tokens.css',
-  'css/tokens-premium.css',
-  'css/base.css',
-  'css/utilities.css',
-  'css/accessibility.css',
-  'css/navigation.css',
-  'css/hero.css',
-  'css/sections.css',
-  'css/instruments.css',
-  'css/components.css',
-  'css/buttons.css',
-  'css/buttons-premium.css',
-  'css/cards.css',
-  'css/cards-premium.css',
-  'css/forms.css',
-  'css/modals.css',
-  'css/animations-premium.css',
-  'css/cursor.css',
-  'css/responsive.css',
+  'css/tokens.css', 'css/tokens-premium.css', 'css/base.css', 'css/utilities.css',
+  'css/accessibility.css', 'css/navigation.css', 'css/hero.css', 'css/sections.css',
+  'css/instruments.css', 'css/components.css', 'css/buttons.css', 'css/buttons-premium.css',
+  'css/cards.css', 'css/cards-premium.css', 'css/forms.css', 'css/modals.css',
+  'css/animations-premium.css', 'css/cursor.css', 'css/responsive.css',
 ];
-
-// Lista de arquivos JS para concatenar
 const jsFiles = [
-  'data.js',
-  'js/animations.js',
-  'js/hover-effects.js',
-  'js/micro-interactions.js',
-  'js/particles.js',
-  'js/main.js',
+  'js/data.js', 'js/animations.js', 'js/hover-effects.js', 'js/micro-interactions.js',
+  'js/particles.js', 'js/main.js',
 ];
 
-function concatFiles(files, ext) {
-  let content = '';
-  files.forEach((file) => {
-    const filePath = path.join(__dirname, '..', file);
-    if (fs.existsSync(filePath)) {
-      content += fs.readFileSync(filePath, 'utf8') + '\n';
-      console.log(`  ✓ ${file}`);
-    } else {
-      console.log(`  ✗ ${file} (not found)`);
-    }
-  });
-  return content;
+function concatFiles(files) {
+  return files.map((file) => {
+    const filePath = path.join(ROOT_DIR, file);
+    if (!fs.existsSync(filePath)) throw new Error(`Missing build input: ${file}`);
+    console.log(`  bundled ${file}`);
+    return fs.readFileSync(filePath, 'utf8');
+  }).join('\n');
 }
 
-console.log('🔨 DUCK PROD - Build\n');
+function copyFile(relativePath) {
+  const destination = path.join(BUILD_DIR, relativePath);
+  fs.mkdirSync(path.dirname(destination), { recursive: true });
+  fs.copyFileSync(path.join(ROOT_DIR, relativePath), destination);
+  console.log(`  copied ${relativePath}`);
+}
 
-// Concatenar CSS
-console.log('📦 Concatenando CSS...');
-const cssContent = concatFiles(cssFiles, '.css');
+function copyDirectory(sourceDir, destinationDir) {
+  fs.mkdirSync(destinationDir, { recursive: true });
+  for (const entry of fs.readdirSync(sourceDir, { withFileTypes: true })) {
+    const source = path.join(sourceDir, entry.name);
+    const destination = path.join(destinationDir, entry.name);
+    if (entry.isDirectory()) copyDirectory(source, destination);
+    else fs.copyFileSync(source, destination);
+  }
+}
+
+fs.mkdirSync(BUILD_DIR, { recursive: true });
+console.log('DUCK PROD build\n');
+
+console.log('Bundling CSS...');
+const cssContent = concatFiles(cssFiles).replace(/\.\.\/images\//g, 'images/');
 fs.writeFileSync(path.join(BUILD_DIR, 'styles.min.css'), cssContent);
-console.log(`  → dist/styles.min.css (${(cssContent.length / 1024).toFixed(1)}KB)\n`);
+console.log(`  dist/styles.min.css (${(cssContent.length / 1024).toFixed(1)}KB)\n`);
 
-// Concatenar JS
-console.log('📦 Concatenando JS...');
-const jsContent = concatFiles(jsFiles, '.js');
-fs.writeFileSync(path.join(BUILD_DIR, 'app.min.js'), jsContent);
-console.log(`  → dist/app.min.js (${(jsContent.length / 1024).toFixed(1)}KB)\n`);
+console.log('Copying ES modules...');
+jsFiles.forEach(copyFile);
+console.log('');
 
-// Copiar index.html
-const indexHtml = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+console.log('Copying media...');
+copyDirectory(path.join(ROOT_DIR, 'images'), path.join(BUILD_DIR, 'images'));
+console.log('  dist/images\n');
+
+const indexHtml = fs.readFileSync(path.join(ROOT_DIR, 'index.html'), 'utf8');
 const optimizedHtml = indexHtml
-  .replace(/<!-- Modular CSS \(dependency order\)-->/g, '<link rel="stylesheet" href="dist/styles.min.css">')
-  .replace(/<!-- Modular JS \(dependency order\)-->/g, '<script src="dist/app.min.js" defer></script>')
-  .replace(/<link rel="stylesheet" href="css\/[^"]*">\s*/g, '')
-  .replace(/<script src="[^"]*\.js" defer><\/script>\s*/g, '');
+  .replace(/<!-- Modular CSS \(dependency order\)-->/g, '<link rel="stylesheet" href="styles.min.css">')
+  .replace(/\s*<link rel="stylesheet" href="css\/[^\"]*">/g, '');
 
 fs.writeFileSync(path.join(BUILD_DIR, 'index.html'), optimizedHtml);
-console.log('📄 dist/index.html otimizado\n');
-
-console.log('✅ Build completo! Arquivos em /dist');
+console.log('dist/index.html ready\n');
+console.log('Build complete: /dist');

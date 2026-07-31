@@ -1,59 +1,52 @@
 // hover-effects.js — Premium hover interactions for DUCK
-(function() {
-  // Magnetic buttons
-  document.querySelectorAll('.btn-p, .studio-btn').forEach(function(button) {
-    button.addEventListener('mousemove', function(e) {
-      var rect = button.getBoundingClientRect();
-      var x = e.clientX - rect.left - rect.width / 2;
-      var y = e.clientY - rect.top - rect.height / 2;
-      button.style.transform = 'translate(' + (x * 0.15) + 'px, ' + (y * 0.15) + 'px)';
-    });
-    button.addEventListener('mouseleave', function() {
-      button.style.transform = '';
-    });
+let hoverEffectsInitialized = false;
+
+export function initHoverEffects() {
+  if (hoverEffectsInitialized || window.innerWidth < 768) return;
+  hoverEffectsInitialized = true;
+
+  document.addEventListener('mousemove', function(event) {
+    var button = event.target.closest('.btn-p, .studio-btn');
+    var card = event.target.closest('.svc, .tool-card, .station-card');
+    var target = button || card;
+    if (!target) return;
+
+    var rect = target.getBoundingClientRect();
+    if (button) {
+      var buttonX = event.clientX - rect.left - rect.width / 2;
+      var buttonY = event.clientY - rect.top - rect.height / 2;
+      button.style.transform = 'translate(' + (buttonX * 0.15) + 'px, ' + (buttonY * 0.15) + 'px)';
+      return;
+    }
+
+    var cardX = (event.clientX - rect.left) / rect.width - 0.5;
+    var cardY = (event.clientY - rect.top) / rect.height - 0.5;
+    card.style.transform = 'perspective(800px) rotateY(' + (cardX * 8) + 'deg) rotateX(' + (-cardY * 8) + 'deg) translateY(-5px)';
   });
 
-  // Tilt cards on hover
-  document.querySelectorAll('.svc, .tool-card, .station-card').forEach(function(card) {
-    card.addEventListener('mousemove', function(e) {
-      var rect = card.getBoundingClientRect();
-      var x = (e.clientX - rect.left) / rect.width - 0.5;
-      var y = (e.clientY - rect.top) / rect.height - 0.5;
-      card.style.transform = 'perspective(800px) rotateY(' + (x * 8) + 'deg) rotateX(' + (-y * 8) + 'deg) translateY(-5px)';
-    });
-    card.addEventListener('mouseleave', function() {
-      card.style.transform = '';
-    });
+  document.addEventListener('mouseout', function(event) {
+    var target = event.target.closest('.btn-p, .studio-btn, .svc, .tool-card, .station-card');
+    if (!target || target.contains(event.relatedTarget)) return;
+    target.style.transform = '';
   });
 
-  // Image hover zoom
-  document.querySelectorAll('.single-item, .port-item, .gallery-item').forEach(function(item) {
-    item.addEventListener('mouseenter', function() {
+  document.addEventListener('mouseover', function(event) {
+    var item = event.target.closest('.single-item, .port-item, .gallery-item');
+    var link = event.target.closest('.nav-links a');
+    if (item) {
       var overlay = item.querySelector('.single-over, .port-over, .gallery-caption');
       if (overlay) overlay.style.opacity = '1';
-    });
-    item.addEventListener('mouseleave', function() {
+    }
+    if (link) link.style.color = 'var(--a)';
+  });
+
+  document.addEventListener('mouseout', function(event) {
+    var item = event.target.closest('.single-item, .port-item, .gallery-item');
+    var link = event.target.closest('.nav-links a');
+    if (item && !item.contains(event.relatedTarget)) {
       var overlay = item.querySelector('.single-over, .port-over, .gallery-caption');
       if (overlay) overlay.style.opacity = '';
-    });
+    }
+    if (link && !link.contains(event.relatedTarget) && !link.classList.contains('active')) link.style.color = '';
   });
-
-  // Nav link underline animation
-  document.querySelectorAll('.nav-links a').forEach(function(link) {
-    link.addEventListener('mouseenter', function() {
-      link.style.color = 'var(--a)';
-    });
-    link.addEventListener('mouseleave', function() {
-      if (!link.classList.contains('active')) {
-        link.style.color = '';
-      }
-    });
-  });
-
-  // Mobile fallback - disable transforms
-  if (window.innerWidth < 768) {
-    document.querySelectorAll('.btn-p, .studio-btn, .svc, .tool-card, .station-card').forEach(function(el) {
-      el.style.transform = '';
-    });
-  }
-})();
+}

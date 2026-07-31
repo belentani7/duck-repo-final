@@ -7,8 +7,8 @@
 │                  index.html                  │
 │            (Página Principal)                │
 ├─────────────┬──────────────┬────────────────┤
-│   css/      │     js/      │    data.js     │
-│  (19 file)  │   (5 files)  │  (Dados)       │
+│   css/      │              js/              │
+│  (19 files) │   (6 ES modules, including data) │
 ├─────────────┴──────────────┴────────────────┤
 │              Dependências CDN               │
 │  GSAP 3.12 · Lenis 1.3 · Web Audio API     │
@@ -44,19 +44,19 @@ Paleta de cores, escala tipográfica, spacing, shadows, transitions.
 ## JS Architecture
 
 ### Módulos
-1. `data.js` — Dados centralizados (info, stats, singles, traduções)
+1. `js/data.js` — Dados centralizados (info, stats, singles, traduções)
 2. `animations.js` — GSAP ScrollTrigger, parallax, reveals
 3. `hover-effects.js` — Magnetic buttons, tilt cards
 4. `micro-interactions.js` — Toggle, ripple, loading states
 5. `particles.js` — Particle system para hero
-6. `main.js` — Orquestrador, init, event listeners
+6. `main.js` — Entrada ES module, orquestrador e event listeners
 
 ### Fluxo de Inicialização
 ```
-DOMContentLoaded
+DOMContentLoaded (js/main.js)
   → initLenis()        // Smooth scroll
-  → initGSAP()         // ScrollTrigger setup
-  → initParticles()    // Hero particles
+  → initAnimations()   // ScrollTrigger setup
+  → initParticlesCSS() // Hero particles
   → initPiano()        // Web Audio API
   → initRhythm()       // Beat sequencer
   → initVoice()        // Voice visualizer
@@ -69,7 +69,7 @@ DOMContentLoaded
 ## Data Flow
 
 ```
-data.js (DUCK_DATA)
+js/data.js (DUCK_DATA)
   ├── translations → applyLanguage(lang)
   ├── singles → renderSingles()
   ├── services → renderServices()

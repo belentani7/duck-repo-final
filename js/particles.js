@@ -1,7 +1,8 @@
 // particles.js — CSS-based floating particles for DUCK
-function initParticlesCSS() {
+export function initParticlesCSS() {
   var container = document.getElementById('particles');
-  if (!container) return;
+  if (!container || container.dataset.particlesInitialized === 'true') return;
+  container.dataset.particlesInitialized = 'true';
 
   for (var i = 0; i < 30; i++) {
     var p = document.createElement('div');

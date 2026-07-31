@@ -1,7 +1,7 @@
 // DUCK — Musical Producer Portfolio Data
 // Data.js - All project data for the Duck website
 
-const DUCK_DATA = {
+export const DUCK_DATA = {
   // Basic Info
   name: "Duck",
   location: "Aracaju, Brasil",
@@ -522,8 +522,3 @@ const DUCK_DATA = {
     }
   }
 };
-
-// Export for use in other files
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = DUCK_DATA;
-}
