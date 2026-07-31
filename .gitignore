@@ -15,6 +15,7 @@ Desktop.ini
 
 # Dependencies
 node_modules/
+.worktrees/
 package-lock.json
 yarn.lock
 
